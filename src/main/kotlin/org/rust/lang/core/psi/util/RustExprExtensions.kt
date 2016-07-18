@@ -1,9 +1,6 @@
 package org.rust.lang.core.psi.util
 
-import org.rust.lang.core.psi.RustEnumVariantElement
-import org.rust.lang.core.psi.RustNamedElement
-import org.rust.lang.core.psi.RustStructExprElement
-import org.rust.lang.core.psi.RustStructItemElement
+import org.rust.lang.core.psi.*
 
 /**
  *  `RustExprElement` related extensions
@@ -18,3 +15,9 @@ val RustStructExprElement.fields: List<RustNamedElement> get() {
     }
 }
 
+
+/**
+ * Extracts [RustLitExprElement] raw value
+ */
+val RustLitExprElement.stringLiteralValue: String?
+    get() = ((stringLiteral ?: rawStringLiteral) as? RustLiteral.Text)?.value

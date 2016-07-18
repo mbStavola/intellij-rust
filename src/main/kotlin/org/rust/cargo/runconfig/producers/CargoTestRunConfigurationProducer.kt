@@ -13,6 +13,7 @@ import org.rust.lang.core.psi.RustMod
 import org.rust.lang.core.psi.canonicalCratePath
 import org.rust.lang.core.psi.functions
 import org.rust.lang.core.psi.util.parentOfType
+import org.rust.lang.core.symbols.stringize
 
 class CargoTestRunConfigurationProducer : RunConfigurationProducer<CargoCommandConfiguration>(CargoCommandRunConfigurationType()) {
 
@@ -66,7 +67,7 @@ class CargoTestRunConfigurationProducer : RunConfigurationProducer<CargoCommandC
         else
             "Test ${mod.modName}"
 
-        val testPath = mod.canonicalCratePath ?: return null
+        val testPath = mod.canonicalCratePath?.stringize() ?: return null
         return if (mod.functions.any { it.isTest }) TestConfig(testName, testPath) else null
     }
 }
