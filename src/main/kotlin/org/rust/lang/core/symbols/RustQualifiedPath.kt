@@ -127,24 +127,16 @@ interface RustQualifiedPath {
      *    https://doc.rust-lang.org/reference.html#use-declarations
      */
     val fullyQualified: Boolean
+
+    override fun equals(other: Any?): Boolean
+
+    override fun hashCode(): Int
 }
 
 fun RustQualifiedPath.unfold(): Sequence<RustQualifiedPathPart> =
     (qualifier?.unfold() ?: emptySequence()) + sequenceOf(part)
 
-fun RustQualifiedPath?.isEqualTo(other: RustQualifiedPath?): Boolean {
-    val one = this
-    if ((one != null) xor (other != null))
-        return false
 
-    val lop = one?.unfold()?.toList()   ?: emptyList()
-    val rop = other?.unfold()?.toList() ?: emptyList()
-
-    if (lop.size != rop.size)
-        return false
-
-    return lop.zip(rop).all { it.first == it.second }
-}
 
 fun RustQualifiedPath.stringize(): String {
     val qualifier = qualifier

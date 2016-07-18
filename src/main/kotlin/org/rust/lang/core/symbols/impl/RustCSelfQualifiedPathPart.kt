@@ -7,4 +7,7 @@ object RustCSelfQualifiedPathPart : RustQualifiedPathPart {
     override val name: String
         get() = "Self"
 
+    override fun equals(other: Any?): Boolean = other is RustCSelfQualifiedPathPart
+
+    override fun hashCode(): Int = 4231
 }

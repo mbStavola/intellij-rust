@@ -7,4 +7,8 @@ object RustSelfQualifiedPathPart : RustQualifiedPathPart {
     override val name: String
         get() = "self"
 
+    override fun equals(other: Any?): Boolean = other is RustSelfQualifiedPathPart
+
+    override fun hashCode(): Int = 5309
+
 }

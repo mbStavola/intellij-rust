@@ -17,6 +17,9 @@ class RustTupleType(private val elements: List<RustType>) : RustType {
         return elements.getOrElse(i, { RustUnknownType })
     }
 
+    val types: Iterable<RustType>
+        get() = elements
+
     val size: Int = elements.size
 }
 

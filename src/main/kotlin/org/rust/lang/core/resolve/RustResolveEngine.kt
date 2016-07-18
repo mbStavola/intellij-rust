@@ -64,8 +64,8 @@ object RustResolveEngine {
         class Resolved(resolved: RustNamedElement) : ResolveResult(resolved)
     }
 
-    fun resolve(type: RustUnresolvedType): RustType =
-        type.accept(RustTypeResolvingVisitor())
+    fun resolve(type: RustUnresolvedType, pivot: RustCompositeElement): RustType =
+        type.accept(RustTypeResolvingVisitor(pivot))
 
     /**
      * ???

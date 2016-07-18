@@ -1,17 +1,26 @@
 package org.rust.lang.core.types.unresolved
 
 import org.rust.lang.core.types.visitors.RustUnresolvedTypeVisitor
+import java.io.DataInput
+import java.io.DataOutput
 
 interface RustUnresolvedType {
 
+    companion object {
+        fun serialize(type: RustUnresolvedType?, output: DataOutput) {
+            throw UnsupportedOperationException()
+        }
+
+        fun deserialize(input: DataInput): RustUnresolvedType? {
+            throw UnsupportedOperationException()
+        }
+    }
+
     fun <T> accept(visitor: RustUnresolvedTypeVisitor<T>): T
 
-    /**
-     * If this is a nominal type (struct, enum or trait object), returns type's name.
-     * Does **not** strip references.
-     *
-     * See `RustType#baseTypeName`
-     */
-    val nominalTypeName: String? get() = null
+    override fun equals(other: Any?): Boolean
+
+    override fun hashCode(): Int
+
 }
 
