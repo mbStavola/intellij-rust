@@ -9,8 +9,8 @@ import org.rust.lang.core.psi.RustTypeBearingItemElement
 import org.rust.lang.core.psi.RustTypeElement
 import org.rust.lang.core.types.RustType
 import org.rust.lang.core.types.unresolved.RustUnresolvedType
-import org.rust.lang.core.types.visitors.RustTypeResolvingVisitor
-import org.rust.lang.core.types.visitors.RustTypificationEngine
+import org.rust.lang.core.types.visitors.impl.RustTypeResolvingVisitor
+import org.rust.lang.core.types.visitors.impl.RustTypificationEngine
 
 val RustExprElement.resolvedType: RustType
     get() =
