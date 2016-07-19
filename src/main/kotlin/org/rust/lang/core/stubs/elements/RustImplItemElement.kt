@@ -37,7 +37,7 @@ object RustImplItemStubElementType : RustStubElementType<RustImplItemElementStub
 
     override fun indexStub(stub: RustImplItemElementStub, sink: IndexSink) {
         stub.type?.let {
-            sink.occurrence(RustImplIndex.KEY, it)
+            sink.occurrence(RustImplIndex.KEY, RustImplIndex.Key(it))
         }
     }
 

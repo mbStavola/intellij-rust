@@ -32,4 +32,13 @@ internal class RustQualifiedPath(
 
     override fun hashCode(): Int =
         (qualifier?.hashCode() ?: 0) * 11437 + part.hashCode() + fullyQualified.int * 4129
+
+    override fun toString(): String {
+        return if (qualifier != null)
+            "$qualifier::${part.name}"
+        else if (fullyQualified)
+            "::${part.name}"
+        else
+            "${part.name}"
+    }
 }

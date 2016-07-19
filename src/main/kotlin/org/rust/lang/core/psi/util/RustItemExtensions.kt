@@ -15,8 +15,8 @@ val RustStructItemElement.fields: List<RustFieldDeclElement>
 val RustGenericDeclaration.typeParams: List<RustTypeParamElement>
     get() = genericParams?.typeParamList.orEmpty()
 
-val RustImplItemElement.ref: RustQualifiedPath?
-    get() = stub?.ref ?: if (traitRef != null) traitRef?.path else (type?.type as? RustUnresolvedPathType?)?.path
+//val RustImplItemElement.ref: RustQualifiedPath?
+//    get() = stub?.ref ?: if (traitRef != null) traitRef?.path else (type?.type as? RustUnresolvedPathType?)?.path
 
 val RustUseItemElement.aliased: String?
     get() = stub?.alias ?: alias?.name

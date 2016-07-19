@@ -35,7 +35,7 @@ val RustTypeElement.resolvedType: RustType
     get() =
         CachedValuesManager.getCachedValue(this,
             CachedValueProvider {
-                CachedValueProvider.Result.create(type.accept(RustTypeResolvingVisitor()), PsiModificationTracker.MODIFICATION_COUNT)
+                CachedValueProvider.Result.create(type.accept(RustTypeResolvingVisitor(this)), PsiModificationTracker.MODIFICATION_COUNT)
             }
         )
 

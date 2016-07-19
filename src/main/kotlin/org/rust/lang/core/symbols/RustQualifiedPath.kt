@@ -1,6 +1,7 @@
 package org.rust.lang.core.symbols
 
 import org.rust.lang.core.psi.RelativeModulePrefix
+import org.rust.lang.core.symbols.impl.RustNamedQualifiedPathPart
 import org.rust.lang.core.symbols.impl.RustSelfQualifiedPathPart
 import org.rust.lang.core.symbols.impl.RustSuperQualifiedPathPart
 import java.io.DataInput
