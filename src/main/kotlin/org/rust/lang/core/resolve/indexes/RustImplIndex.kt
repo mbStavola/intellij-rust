@@ -1,5 +1,6 @@
 package org.rust.lang.core.resolve.indexes
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.AbstractStubIndex
 import com.intellij.psi.stubs.StringStubIndexExtension
@@ -8,15 +9,16 @@ import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.io.KeyDescriptor
 import org.rust.lang.core.RustFileElementType
 import org.rust.lang.core.psi.*
-import org.rust.lang.core.resolve.RustResolveEngine
-import org.rust.lang.core.symbols.RustQualifiedPath
-import org.rust.lang.core.symbols.RustQualifiedPathPart
+import org.rust.lang.core.types.RustEnumType
+import org.rust.lang.core.types.RustStructOrEnumTypeBase
+import org.rust.lang.core.types.RustStructType
+import org.rust.lang.core.types.RustType
 import org.rust.lang.core.types.unresolved.RustUnresolvedPathType
 import org.rust.lang.core.types.unresolved.RustUnresolvedType
+import org.rust.lang.core.types.util.decay
 import org.rust.lang.core.types.util.resolvedType
 import org.rust.lang.core.types.visitors.impl.RustEqualityUnresolvedTypeVisitor
 import org.rust.lang.core.types.visitors.impl.RustHashCodeComputingUnresolvedTypeVisitor
-import org.rust.utils.Either
 import java.io.DataInput
 import java.io.DataOutput
 
@@ -53,26 +55,44 @@ class RustImplIndex : AbstractStubIndex<RustImplIndex.Key, RustImplItemElement>(
 
     companion object {
 
-        fun findImplsFor(target: RustStructOrEnumItemElement): Sequence<RustImplItemElement> =
-            findImplsByRefInternal(Either.left(target))
+        fun findNonStaticMethodsFor(target: RustType, project: Project): Sequence<RustImplMethodMemberElement> =
+            findMethodsFor(target, project)
+                .filter { !it.isStatic }
 
-        fun findImplsFor(target: RustTraitItemElement): Sequence<RustImplItemElement> =
-            findImplsByRefInternal(Either.right(target))
+        fun findStaticMethodsFor(target: RustType, project: Project): Sequence<RustImplMethodMemberElement> =
+            findMethodsFor(target, project)
+                .filter { it.isStatic }
 
-        private fun findImplsByRefInternal(target: Either<RustStructOrEnumItemElement, RustTraitItemElement>): Sequence<RustImplItemElement> {
-            val item = Either.apply(target) { item: RustItemElement -> item }
+        fun findMethodsFor(target: RustType, project: Project): Sequence<RustImplMethodMemberElement> =
+            findImplsFor(target, project)
+                .flatMap { it.implBody?.implMethodMemberList.orEmpty().asSequence() }
 
-            // TODO(XXX): Rollback
-            //val type = RustUnresolvedPathType(item.canonicalCratePath!!)
-            val type = RustUnresolvedPathType(RustQualifiedPath.create(RustQualifiedPathPart.from(item.name!!)))
+        fun findImplsFor(target: RustType, project: Project): Sequence<RustImplItemElement> =
+            findImplsForInternal(target.decay, project)
+                .filter {
+                    impl -> impl.type?.let { it.resolvedType == target} ?: false
+                }
 
-            return findImplsForInternal(type, item)
+        fun findImplsFor(target: RustStructOrEnumItemElement): Sequence<RustImplItemElement> {
+            val impls =
+                if (target is RustStructItemElement)
+                    findImplsForInternal(RustStructType(target).decay, target.project)
+                else if (target is RustEnumItemElement)
+                    findImplsForInternal(RustEnumType(target).decay, target.project)
+                else
+                    throw IllegalStateException("Panic! `RustStructOrEnumItemElement` may not be extended by the classes beyond `RustStructItemElement` and `RustEnumItemElement`")
+
+            return impls.filter { impl ->
+                impl.type?.let {
+                    it.resolvedType.let { ty ->
+                        ty is RustStructOrEnumTypeBase && ty.item == target
+                    }
+                } ?: false
+            }
         }
 
-        private fun findImplsForInternal(target: RustUnresolvedType, pivot: RustCompositeElement): Sequence<RustImplItemElement> {
+        private fun findImplsForInternal(target: RustUnresolvedType, project: Project): Sequence<RustImplItemElement> {
             val found: MutableList<RustImplItemElement> = arrayListOf()
-
-            val project = pivot.project
 
             StubIndex
                 .getInstance()
@@ -87,10 +107,8 @@ class RustImplIndex : AbstractStubIndex<RustImplIndex.Key, RustImplItemElement>(
                         true /* continue */
                     })
 
-            val resolved = lazy { RustResolveEngine.resolve(target, pivot) }
-
             return found.asSequence()
-                        .filter { impl -> impl.type?.let { it.resolvedType == resolved.value } ?: false }
+
         }
 
         val KEY: StubIndexKey<Key, RustImplItemElement> =

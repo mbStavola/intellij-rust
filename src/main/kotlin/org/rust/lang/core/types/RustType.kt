@@ -1,7 +1,10 @@
 package org.rust.lang.core.types
 
+import com.intellij.openapi.project.Project
 import org.rust.lang.core.psi.RustImplItemElement
 import org.rust.lang.core.psi.RustImplMethodMemberElement
+import org.rust.lang.core.resolve.indexes.RustImplIndex
+import org.rust.lang.core.types.util.decay
 import org.rust.lang.core.types.visitors.RustTypeVisitor
 
 interface RustType {
@@ -14,22 +17,15 @@ interface RustType {
 
     override fun toString(): String
 
-    /**
-     * Impls without traits, like `impl S { ... }`
-     *
-     * You don't need to import such impl to be able to use its methods.
-     * There may be several `impl` blocks for the same type and they may
-     * be spread across different files and modules (we don't handle this yet)
-     */
-    val inherentImpls: Sequence<RustImplItemElement> get() = emptySequence()
-
-    val allMethods: Sequence<RustImplMethodMemberElement>
-        get() = inherentImpls.flatMap { it.implBody?.implMethodMemberList.orEmpty().asSequence() }
-
-    val nonStaticMethods: Sequence<RustImplMethodMemberElement>
-        get() = allMethods.filter { !it.isStatic }
-
-    val staticMethods: Sequence<RustImplMethodMemberElement>
-        get() = allMethods.filter { it.isStatic }
-
+//    val impls: Sequence<RustImplItemElement>
+//        get() = RustImplIndex.findImplsFor(this, ?)
+//
+//    val nonStaticMethods: Sequence<RustImplMethodMemberElement>
+//        get() = methods.filter { !it.isStatic }
+//
+//    val staticMethods: Sequence<RustImplMethodMemberElement>
+//        get() = methods.filter { it.isStatic }
+//
+//    private val methods: Sequence<RustImplMethodMemberElement>
+//        get() = impls.flatMap { it.implBody?.implMethodMemberList.orEmpty().asSequence() }
 }
