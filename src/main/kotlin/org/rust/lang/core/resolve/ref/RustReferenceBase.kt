@@ -32,7 +32,6 @@ abstract class RustReferenceBase<T : RustCompositeElement>(
             }
         }
 
-    // enforce not nullability
     final override fun getRangeInElement(): TextRange = super.getRangeInElement()
 
     final override fun calculateDefaultRangeInElement(): TextRange {
@@ -40,7 +39,7 @@ abstract class RustReferenceBase<T : RustCompositeElement>(
         return element.referenceAnchor.parentRelativeRange
     }
 
-    val cache = ResolveCache.getInstance(element.project)
+    val cache: ResolveCache = ResolveCache.getInstance(element.project)
 
     private fun cache(block: (RustReferenceBase<T>, Boolean) -> RustResolveEngine.ResolveResult): RustResolveEngine.ResolveResult =
         cache.resolveWithCaching(
